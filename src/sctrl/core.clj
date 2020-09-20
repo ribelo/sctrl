@@ -129,7 +129,7 @@
 (defn -main [& args]
   (let [opts        (cli/parse-opts args cli-opts)
         config-file (or (get-in opts [:options :config-file]) default-config-file)
-        config      (e/catching (e/read-edn (slurp (or (get-in) default-config-file))))]
+        config      (e/catching (e/read-edn (slurp config-file)))]
     (r/match [opts config]
 
       [{:options {:init true}} (r/not (r/some))]
