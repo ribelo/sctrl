@@ -15,7 +15,7 @@
 (def version [0 0 1])
 (def home-dir (System/getProperty "user.home"))
 (def config-dir (e/path home-dir ".config" "sctrl"))
-(def config-file (e/path config-dir "config.edn"))
+(def default-config-file (e/path config-dir "config.edn"))
 
 (defn parse-etime [s]
   (r/match (str/split s #":|-")
@@ -63,7 +63,9 @@
 
 (defn kill-processes-by-regex! [s]
   (doseq [{:keys [pid]} (filter-processes-by-regex s)]
-    (kill-process-by-pid! pid)))
+    (do
+      (kill-process-by-pid! pid)
+      (timbre/infof "kill process %s pid: %s" s pid))))
 
 (defn ->hours&minutes [s]
   (->> (str/split s #":")
@@ -112,7 +114,7 @@
 
 (defn watch! []
   (loop []
-    (let [config (parse-config (e/read-edn (slurp config-file)))]
+    (let [config (parse-config (e/read-edn (slurp default-config-file)))]
       (doseq [rule config]
         (execute-rule! rule)))
     (Thread/sleep 1000)
@@ -121,25 +123,29 @@
 (def cli-opts
   [["-v" "--version" nil]
    [nil "--init" nil]
-   ["-k" "--kill-all-by-name RGX" nil]])
+   ["-k" "--kill-all-by-name RGX" nil]
+   ["-c" "--config-file PATH" nil]])
 
 (defn -main [& args]
-  (let [config (e/catching (e/read-edn (slurp config-file)))
-        opts   (cli/parse-opts args cli-opts)]
+  (let [opts        (cli/parse-opts args cli-opts)
+        config-file (or (get-in opts [:options :config-file]) default-config-file)
+        config      (e/catching (e/read-edn (slurp (or (get-in) default-config-file))))]
     (r/match [opts config]
 
       [{:options {:init true}} (r/not (r/some))]
-      (if-not (.exists (io/as-file config-file))
+      (if-not (.exists (io/as-file default-config-file))
         (do
-          (io/make-parents config-file)
-          (spit config-file (e/pr-edn {})))
-        (println (format "file %s exists!" config-file)))
+          (io/make-parents default-config-file)
+          (spit default-config-file (e/pr-edn {})))
+        (timbre/errorf "file %s exists!" config-file))
 
       [{:options {:kill-all-by-name (r/some ?rgx)}} _]
       (kill-processes-by-regex! (str/lower-case ?rgx))
 
       [{:options (r/pred empty?)} (r/some)]
-      (watch!)
+      (do
+        (timbre/info "start watching!")
+        (watch!))
 
       [_ (r/not (r/some))]
-      (println (format "config file %s not exists!" config-file)))))
+      (timbre/infof "config file %s not exists!" config-file))))
