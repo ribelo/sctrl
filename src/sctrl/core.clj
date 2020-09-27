@@ -8,7 +8,6 @@
    [lambdaisland.regal :as regal]
    [java-time :as jt]
    [clojure.string :as str]
-   [malli.core :as m]
    [clojure.java.shell :refer [sh]])
   (:gen-class))
 
@@ -47,6 +46,9 @@
        (transform-process)
        (zipmap [:user :pid :etime :cmd])))
 
+(defn notify-send [s]
+  (sh "notify-send" s))
+
 (defn list-processes []
   (->> (sh "ps" "axo" "user,pid,etime,cmd")
        :out
@@ -63,9 +65,10 @@
 
 (defn kill-processes-by-regex! [s]
   (doseq [{:keys [pid]} (filter-processes-by-regex s)]
-    (do
+    (let [msg (format "kill process: %s pid: %s" s pid)]
       (kill-process-by-pid! pid)
-      (timbre/infof "kill process %s pid: %s" s pid))))
+      (timbre/info msg)
+      (notify-send msg))))
 
 (defn ->hours&minutes [s]
   (->> (str/split s #":")
@@ -117,7 +120,7 @@
     (let [config (parse-config (e/read-edn (slurp default-config-file)))]
       (doseq [rule config]
         (execute-rule! rule)))
-    (Thread/sleep 1000)
+    (Thread/sleep 5000)
     (recur)))
 
 (def cli-opts
@@ -131,6 +134,8 @@
         config-file (or (get-in opts [:options :config-file]) default-config-file)
         config      (e/catching (e/read-edn (slurp config-file)))]
     (r/match [opts config]
+
+      [{:options {:version true}} _] (println (str/join "." version))
 
       [{:options {:init true}} (r/not (r/some))]
       (if-not (.exists (io/as-file default-config-file))

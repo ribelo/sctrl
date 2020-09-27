@@ -1,13 +1,12 @@
-{:paths   ["src"]
+{:paths   ["src" "classes"]
  :deps    {org.clojure/clojure   {:mvn/version "1.10.1"}
            com.taoensso/encore   {:mvn/version "3.0.0"}
            org.clojure/tools.cli {:mvn/version "1.0.194"}
            com.taoensso/timbre   {:mvn/version "4.10.0"}
            clojure.java-time     {:mvn/version "0.3.2"}
-           cheshire              {:mvn/version "5.10.0"}
-           metosin/malli         {:mvn/version "0.0.1-SNAPSHOT"}
            meander/epsilon       {:mvn/version "0.0.488"}
-           lambdaisland/regal    {:mvn/version "0.0.89"}}
+           lambdaisland/regal    {:mvn/version "0.0.89"}
+           joda-time/joda-time   {:mvn/version "2.10.1"}}
  :aliases {:native-image
            {:main-opts ["-m clj.native-image core"
                         "--initialize-at-build-time"
@@ -19,5 +18,7 @@
              {:git/url "https://github.com/taylorwood/clj.native-image.git"
               :sha     "7708e7fd4572459c81f6a6b8e44c96f41cdd92d4"}}}
            :depstar
-           {:extra-deps
-            {seancorfield/depstar {:mvn/version "1.0.97"}}}}}
+           {:extra-deps {seancorfield/depstar {:mvn/version "1.0.97"}}}
+           :uberdeps
+           {:extra-deps {uberdeps/uberdeps {:mvn/version "1.0.2"}}
+            :main-opts  ["-m" "uberdeps.uberjar"]}}}
