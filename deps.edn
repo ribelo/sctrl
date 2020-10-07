@@ -1,12 +1,7 @@
 {:paths   ["src"]
  :deps    {org.clojure/clojure   {:mvn/version "1.10.1"}
-           com.taoensso/encore   {:mvn/version "3.0.0"}
            org.clojure/tools.cli {:mvn/version "1.0.194"}
-           com.taoensso/timbre   {:mvn/version "4.10.0"}
            clojure.java-time     {:mvn/version "0.3.2"}
-           cheshire              {:mvn/version "5.10.0"}
-           metosin/malli         {:mvn/version "0.0.1-SNAPSHOT"}
-           meander/epsilon       {:mvn/version "0.0.488"}
            lambdaisland/regal    {:mvn/version "0.0.89"}}
  :aliases {:native-image
            {:main-opts ["-m clj.native-image core"

@@ -1,16 +1,14 @@
 (ns sctrl.core
   (:require
+   [babashka.classpath :refer [add-classpath]]
    [clojure.tools.cli :as cli]
    [clojure.java.io :as io]
-   [taoensso.encore :as e]
-   [taoensso.timbre :as timbre]
-   [meander.epsilon :as r]
    [lambdaisland.regal :as regal]
-   [java-time :as jt]
+   ;; [java-time :as jt]
    [clojure.string :as str]
-   [malli.core :as m]
-   [clojure.java.shell :refer [sh]])
-  (:gen-class))
+   [clojure.java.shell :refer [sh]]))
+
+(sh "clojure" "-Spath m")
 
 (def version [0 0 1])
 (def home-dir (System/getProperty "user.home"))
