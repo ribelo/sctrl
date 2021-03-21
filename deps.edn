@@ -1,24 +1,25 @@
-{:paths   ["src" "classes"]
- :deps    {org.clojure/clojure   {:mvn/version "1.10.1"}
-           com.taoensso/encore   {:mvn/version "3.0.0"}
-           org.clojure/tools.cli {:mvn/version "1.0.194"}
-           com.taoensso/timbre   {:mvn/version "4.10.0"}
-           clojure.java-time     {:mvn/version "0.3.2"}
-           meander/epsilon       {:mvn/version "0.0.488"}
-           lambdaisland/regal    {:mvn/version "0.0.89"}
-           joda-time/joda-time   {:mvn/version "2.10.1"}}
+{:paths   ["src"]
+ :deps    {org.clojure/clojure    {:mvn/version "1.10.3"}
+           org.clojure/core.async {:mvn/version "1.3.610"}
+           com.taoensso/encore    {:mvn/version "3.18.0"}
+           org.clojure/tools.cli  {:mvn/version "1.0.206"}
+           meander/epsilon        {:mvn/version "0.0.602"}
+           lambdaisland/regal     {:mvn/version "0.0.89"}
+           cheshire/cheshire      {:mvn/version "5.10.0"}
+           funcool/cuerdas        {:mvn/version "RELEASE"}}
  :aliases {:native-image
-           {:main-opts ["-m clj.native-image core"
+           {:main-opts ["-m" "clj.native-image" "sctrl.core"
                         "--initialize-at-build-time"
                         ;; optional native image name override
-                        "-H:Name=sctrl"]
+                        "-H:Name=sctrl"
+                        "--no-fallback"
+                        "--verbose"
+                        "--no-server"
+                        "--report-unsupported-elements-at-runtime"]
             :jvm-opts  ["-Dclojure.compiler.direct-linking=true"]
             :extra-deps
             {clj.native-image/clj.native-image
              {:git/url "https://github.com/taylorwood/clj.native-image.git"
-              :sha     "7708e7fd4572459c81f6a6b8e44c96f41cdd92d4"}}}
+              :sha     "f3e40672d5c543b80a2019c1f07b2d3fe785962c"}}}
            :depstar
-           {:extra-deps {seancorfield/depstar {:mvn/version "1.0.97"}}}
-           :uberdeps
-           {:extra-deps {uberdeps/uberdeps {:mvn/version "1.0.2"}}
-            :main-opts  ["-m" "uberdeps.uberjar"]}}}
+           {:extra-deps {seancorfield/depstar {:mvn/version "1.0.97"}}}}}
